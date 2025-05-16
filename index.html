@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Rating</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #8f9292, #727070);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      height: 90px;
+      width: auto;
+      margin-bottom: 5px;
+    }
+    .form-section {
+      padding: 30px;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .star {
+      font-size: 30px;
+      cursor: pointer;
+      color: #ccc;
+    }
+    .star.selected {
+      color: gold;
+    }
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="http://dpsrewari.com/frontend/img/logo-share.png" alt="DPS Rewari Logo">
+      <h1>Rate Your Teacher</h1>
+    </div>
+    <div class="form-section">
+      <form id="ratingForm">
+        <label for="classSelect">Select Class</label>
+        <select id="classSelect" onchange="updateSubjects()">
+          <option value="">Select Class</option>
+          <option value="Nursery">Nursery</option>
+          <option value="LKG">LKG</option>
+          <option value="UKG A">UKG A</option>
+          <option value="UKG B">UKG B</option>
+          <option value="I A">I A</option>
+          <option value="I B">I B</option>
+          <option value="II A">II A</option>
+          <option value="II B">II B</option>
+          <option value="II C">II C</option>
+          <option value="II D">II D</option>
+        </select>
+
+        <label for="subjectSelect">Select Subject</label>
+        <select id="subjectSelect" onchange="updateTeachers()">
+          <option value="">Select Subject</option>
+        </select>
+
+        <label for="teacherSelect">Select Teacher</label>
+        <select id="teacherSelect">
+          <option value="">Select Teacher</option>
+        </select>
+
+        <label>Rate the Teacher</label>
+        <div class="stars" id="stars">
+          <span class="star" onclick="selectStar(1)">&#9733;</span>
+          <span class="star" onclick="selectStar(2)">&#9733;</span>
+          <span class="star" onclick="selectStar(3)">&#9733;</span>
+          <span class="star" onclick="selectStar(4)">&#9733;</span>
+          <span class="star" onclick="selectStar(5)">&#9733;</span>
+        </div>
+
+        <input type="hidden" name="rating" id="rating">
+        <br><br>
+        <button class="submit-btn" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const subjectMap = {
+      "Nursery": ["All"],
+      "LKG": ["All"],
+      "UKG A": ["All"],
+      "UKG B": ["All"],
+      "I A": ["All"],
+      "I B": ["All"],
+      "II A": ["English", "Maths", "EVS", "Hindi"],
+      "II B": ["English", "Maths", "EVS", "Hindi"],
+      "II C": ["English", "Maths", "EVS", "Hindi"],
+      "II D": ["English", "Maths", "EVS", "Hindi"]
+    };
+
+    const teacherMap = {
+      "Nursery": {"All": "Ms. Vandana"},
+      "LKG": {"All": "Ms. Priyanka"},
+      "UKG A": {"All": "Ms. Geetu"},
+      "UKG B": {"All": "Ms. Ritoo"},
+      "I A": {"All": "Ms. Sameeksha"},
+      "I B": {"All": "Ms. Shalini"},
+      "II A": {
+        "English": "Ms. Sumitra",
+        "Maths": "Ms. Sumitra",
+        "EVS": "Ms. Ichchha",
+        "Hindi": "Ms. Meenakshi"
+      },
+      "II B": {
+        "English": "Ms. Neelam",
+        "Maths": "Ms. Sumitra",
+        "EVS": "Ms. Ichchha",
+        "Hindi": "Ms. Meenakshi"
+      },
+      "II C": {
+        "English": "Ms. Sumitra",
+        "Maths": "Ms. Sumitra",
+        "EVS": "Ms. Ichchha",
+        "Hindi": "Ms. Meenakshi"
+      },
+      "II D": {
+        "English": "Ms. Ichchha",
+        "Maths": "Ms. Sumitra",
+        "EVS": "Ms. Sumitra",
+        "Hindi": "Ms. Meenakshi"
+      }
+    };
+
+    function updateSubjects() {
+      const classSelect = document.getElementById("classSelect");
+      const subjectSelect = document.getElementById("subjectSelect");
+      const teacherSelect = document.getElementById("teacherSelect");
+      const selectedClass = classSelect.value;
+
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+      teacherSelect.innerHTML = '<option value="">Select Teacher</option>';
+
+      if (selectedClass && subjectMap[selectedClass]) {
+        subjectMap[selectedClass].forEach(subject => {
+          const option = document.createElement("option");
+          option.value = subject;
+          option.text = subject;
+          subjectSelect.appendChild(option);
+        });
+      }
+    }
+
+    function updateTeachers() {
+      const classSelect = document.getElementById("classSelect").value;
+      const subjectSelect = document.getElementById("subjectSelect").value;
+      const teacherSelect = document.getElementById("teacherSelect");
+
+      teacherSelect.innerHTML = '<option value="">Select Teacher</option>';
+      if (classSelect && subjectSelect && teacherMap[classSelect]) {
+        const teacher = teacherMap[classSelect][subjectSelect];
+        if (teacher) {
+          const option = document.createElement("option");
+          option.value = teacher;
+          option.text = teacher;
+          teacherSelect.appendChild(option);
+        }
+      }
+    }
+
+    function selectStar(rating) {
+      const stars = document.querySelectorAll(".star");
+      stars.forEach((star, index) => {
+        star.classList.toggle("selected", index < rating);
+      });
+      document.getElementById("rating").value = rating;
+    }
+
+    document.getElementById("ratingForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const className = document.getElementById("classSelect").value;
+  const subject = document.getElementById("subjectSelect").value;
+  const teacher = document.getElementById("teacherSelect").value;
+  const rating = document.getElementById("rating").value;
+  const submitBtn = document.querySelector(".submit-btn");
+
+  if (!className || !subject || !teacher || !rating) {
+    alert("Please fill out all fields and select a rating.");
+    return;
+  }
+
+  // Disable button and show loading text
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+
+  const payload = {
+    class: className,
+    subject,
+    teacher,
+    rating: parseInt(rating)
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/api/rate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert("Thank you! Your rating has been submitted.");
+      document.getElementById("ratingForm").reset();
+      document.querySelectorAll(".star").forEach(star => star.classList.remove("selected"));
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (error) {
+    alert("Failed to submit. Please try again later.");
+    console.error("Error:", error);
+  } finally {
+    // Re-enable button and reset text
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+  }
+});
+
+
+  </script>
+</body>
+</html>
